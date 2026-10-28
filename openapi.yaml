@@ -1,0 +1,182 @@
+openapi: 3.0.3
+info:
+  title: Knowledge Notes API
+  description: REST API для лабораторної роботи з розгортання в хмарі. Нотатки зберігаються в PostgreSQL.
+  version: 1.0.0
+servers:
+  - url: /
+    description: Поточний хост
+paths:
+  /health:
+    get:
+      summary: Health check
+      tags: [System]
+      responses:
+        "200":
+          description: Сервіс живий
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+  /auth/register:
+    post:
+      summary: Реєстрація користувача
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  minLength: 6
+      responses:
+        "201":
+          description: Користувача створено
+        "400":
+          description: Невалідні дані
+        "409":
+          description: Email уже зайнятий
+  /auth/login:
+    post:
+      summary: Вхід і отримання JWT
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "200":
+          description: JWT токен
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        "401":
+          description: Невірні облікові дані
+  /notes:
+    get:
+      summary: Список нотаток поточного користувача
+      tags: [Notes]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Масив нотаток
+        "401":
+          description: Немає або невалідний токен
+    post:
+      summary: Створити нотатку
+      tags: [Notes]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title]
+              properties:
+                title:
+                  type: string
+                body:
+                  type: string
+      responses:
+        "201":
+          description: Нотатку створено
+        "401":
+          description: Немає або невалідний токен
+  /notes/{id}:
+    get:
+      summary: Отримати нотатку за id
+      tags: [Notes]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Нотатка
+        "401":
+          description: Немає або невалідний токен
+        "404":
+          description: Не знайдено
+    put:
+      summary: Оновити нотатку
+      tags: [Notes]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                body:
+                  type: string
+      responses:
+        "200":
+          description: Оновлено
+        "401":
+          description: Немає або невалідний токен
+        "404":
+          description: Не знайдено
+    delete:
+      summary: Видалити нотатку
+      tags: [Notes]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Видалено
+        "401":
+          description: Немає або невалідний токен
+        "404":
+          description: Не знайдено
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

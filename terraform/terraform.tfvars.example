@@ -1,0 +1,18 @@
+aws_region   = "eu-central-1"
+project_name = "knowledge-notes"
+
+# Заміни на свій GitHub username/org і назву репозиторію
+github_org  = "YOUR_GITHUB_USERNAME"
+github_repo = "YOUR_REPO_NAME"
+
+# Секрет для JWT — згенеруй довгий випадковий рядок
+jwt_secret = "change-me-to-a-long-random-string"
+
+# Email для підтвердження SNS і алертів CloudWatch
+alert_email = "you@example.com"
+
+# false — якщо в акаунті вже є OIDC provider token.actions.githubusercontent.com
+create_github_oidc_provider = true
+
+# Після першого push образу можна зафіксувати тег (необов'язково — CI оновлює сервіс сам)
+# container_image = "123456789012.dkr.ecr.eu-central-1.amazonaws.com/knowledge-notes:abc123"
